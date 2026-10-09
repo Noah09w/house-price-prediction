@@ -1,0 +1,13 @@
+Model outputs
+
+1.Decision Tree:
+    Mean : 8.785107050368362
+Standard Deviation: 0.6756659288978194
+
+
+2. Linear Regration:
+   Mean : 8.785107050368362
+Standard Deviation: 0.6756659288978194
+
+  
+
