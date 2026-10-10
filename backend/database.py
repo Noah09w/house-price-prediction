@@ -67,6 +67,13 @@ def save_prediction_rest(record: dict) -> bool:
         payload = {"fields": fields}
         res = requests.post(url, json=payload, timeout=5)
         if res.status_code in (200, 201):
+            try:
+                data = res.json()
+                doc_id = data.get("name", "").split("/")[-1]
+                if doc_id:
+                    record["id"] = doc_id
+            except Exception:
+                pass
             return True
         else:
             print(f"Firestore REST error ({res.status_code}): {res.text}")

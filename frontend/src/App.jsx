@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
-const API = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
+const API = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 const USD_TO_INR = 95.4;
 const SCALE_MIN = 5;
 const SCALE_MAX = 48;
@@ -120,7 +120,7 @@ function App() {
         Object.entries(form).map(([k, v]) => {
           const field = FIELDS.find(f => f.key === k);
           const num = Number(v);
-          return [k, (v === "" || isNaN(num)) ? (field ? field.default : 0) : num];
+          return [k, (v === "" || isNaN(num)) ? (field?.default ?? 0) : num];
         })
       );
       const r = await fetch(`${API}/predict`, {
@@ -146,7 +146,7 @@ function App() {
       setHistory(prev => [newRecord, ...prev.filter(x => x.id !== newRecord.id)]);
       fetchHistory();
     } catch (err) {
-      setError(err instanceof TypeError ? "Prediction server is offline. Start FastAPI on port 8000, then try again." : (err.message || "Calculation failed."));
+      setError(err instanceof TypeError ? "Prediction server is offline or unreachable. Please try again." : (err.message || "Calculation failed."));
     } finally {
       setLoading(false);
     }

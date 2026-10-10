@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 import os
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import pandas as pd
@@ -92,7 +92,9 @@ class HouseData(BaseModel):
 # Home & Health Endpoints
 # --------------------------------------------------
 
-@app.get("/")
+router = APIRouter()
+
+@router.get("/")
 def home():
     return {
         "status": "online",
@@ -102,7 +104,7 @@ def home():
     }
 
 
-@app.get("/health")
+@router.get("/health")
 def health():
     return {
         "status": "ok",
@@ -116,7 +118,7 @@ def health():
 # Prediction Endpoint
 # --------------------------------------------------
 
-@app.post("/predict")
+@router.post("/predict")
 def predict(data: HouseData):
     if model is None:
         raise HTTPException(status_code=500, detail="Machine Learning model is not loaded on server.")
@@ -193,7 +195,7 @@ def predict(data: HouseData):
 # Get Prediction History
 # --------------------------------------------------
 
-@app.get("/predictions")
+@router.get("/predictions")
 def get_predictions():
     db = get_db()
     if db is not None:
@@ -218,6 +220,13 @@ def get_predictions():
 
     combined.sort(key=lambda x: str(x.get("created_at", "")), reverse=True)
     return combined
+
+
+# --------------------------------------------------
+# Mount Routes for Vercel Services (/api and root)
+# --------------------------------------------------
+app.include_router(router, prefix="/api")
+app.include_router(router)
 
 
 if __name__ == "__main__":
